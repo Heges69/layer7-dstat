@@ -72,17 +72,12 @@
           ],
         });
 
-        info.innerText = "Capturing requests from " + location.host + "/dstat";
+        info.innerText = "Capturing requests from " + location.host + "/hit";
 
-        let ws = new WebSocket(
-          (location.protocol === "https:" ? "wss" : "ws") + "://" + location.host + "/"
-        );
-
-        ws.onmessage = (event) => {
-          let requests = Number(event.data);
-          let time = new Date().getTime();
-          chart.series[0].addPoint([time, requests], true, chart.series[0].points.length > 60);
-        };
+        setInterval(async () => {
+          const requests = await fetch("/stats")
+          chart.series[0].addPoint([new Date().getTime(), Number(await requests.text())], true, chart.series[0].points.length > 60);
+        }, 1000);
       };
     </script>
   </body>
